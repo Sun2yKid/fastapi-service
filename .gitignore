@@ -1,0 +1,41 @@
+# Mac files
+.DS_Store
+
+
+# general output files
+bin/
+gen/
+out/
+build/
+dist/
+node_modules/
+
+# C/C++ specific files
+*.o
+
+# Java/Android specific files
+*.class
+*.apk
+*.ap_
+*.dex
+
+# Python specific files
+*.pyc
+*.egg-info/
+config.yaml
+data/*.yaml
+data/*.csv
+data/*.json
+data/
+fabfile.py
+*.log
+*.log.*
+
+# IDEA specific files
+.idea/
+
+# vscode
+.vscode/
+
+# jupyter lab
+.ipynb_checkpoints
