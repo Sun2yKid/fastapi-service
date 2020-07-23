@@ -1,5 +1,5 @@
 import json
-from abc import ABC
+import os
 
 from sqlalchemy import Column, Integer, MetaData, String, Table, create_engine, ARRAY, types
 
@@ -20,9 +20,10 @@ class TextJson(types.TypeDecorator):
         return json.loads(value)
 
 
-DATABASE_URL = 'mysql://root:zhonghui@localhost/movie_db'
+# DATABASE_URI = 'mysql://root:zhonghui@localhost/movie_db'
+DATABASE_URI = os.getenv('DATABASE_URI')
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URI)
 metadata = MetaData()
 
 movies = Table(
@@ -35,4 +36,4 @@ movies = Table(
     Column('casts', TextJson)
 )
 
-database = Database(DATABASE_URL)
+database = Database(DATABASE_URI)
