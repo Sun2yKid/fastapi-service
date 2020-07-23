@@ -21,7 +21,7 @@ class TextJson(types.TypeDecorator):
 
 
 # DATABASE_URI = 'mysql://root:zhonghui@localhost/movie_db'
-DATABASE_URI = os.getenv('DATABASE_URI')
+DATABASE_URI = os.getenv('DATABASE_URI') or 'mysql://root:zhonghui@localhost/movie_db'
 
 engine = create_engine(DATABASE_URI)
 metadata = MetaData()

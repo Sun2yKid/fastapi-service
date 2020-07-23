@@ -3,6 +3,7 @@ from fastapi import Header, APIRouter, HTTPException
 
 from app.api.models import Movie, MovieIn, MovieOut
 from app.api import db_manager
+from app.api.service import is_cast_present
 
 # fake_movie_db = [
 #     {
@@ -26,6 +27,14 @@ async def index():
     return await db_manager.get_all_movies()
 
 
+@movies.get('/{id}/', response_model=MovieOut)
+async def get_movie(id: int):
+    movie = await db_manager.get_movie(id)
+    if not movie:
+        raise HTTPException(status_code=404, detail="Movie not found")
+    return movie
+
+
 # @movies.post('/', status_code=201)
 # async def add_movie(payload: Movie):
 #     movie = payload.dict()
@@ -35,6 +44,20 @@ async def index():
 
 @movies.post('/', status_code=201)
 async def add_movie(payload: MovieIn):
+    movie_id = await db_manager.add_movie(payload)
+    response = {
+        'id': movie_id,
+        **payload.dict()
+    }
+    return response
+
+
+@movies.post('/', response_model=List[MovieOut], status_code=201)
+async def create_movies(payload: MovieIn):
+    for cast_id in payload.casts_id:
+        if not is_cast_present(cast_id):
+            raise HTTPException(status_code=404, detail=f"Cast with id:{cast_id} not found")
+
     movie_id = await db_manager.add_movie(payload)
     response = {
         'id': movie_id,
@@ -53,13 +76,19 @@ async def add_movie(payload: MovieIn):
 #     return None
 
 
-@movies.put('/{id}')
+@movies.put('/{id}', response_model=MovieOut)
 async def update_movie(id: int, payload: MovieIn):
     movie = await db_manager.get_movie(id)
     if not movie:
         raise HTTPException(status_code=404, detail="Movie not found")
 
     update_data = payload.dict(exclude_unset=True)
+
+    if 'casts_id' in update_data:
+        for cast_id in payload.casts_id:
+            if not is_cast_present(cast_id):
+                raise HTTPException(status_code=404, detail=f"Cast with given id:{cast_id} not found")
+
     movie_in_db = MovieIn(**movie)
 
     updated_movie = movie_in_db.copy(update=update_data)
